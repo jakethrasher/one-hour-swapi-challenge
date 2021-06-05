@@ -21,7 +21,7 @@ const getCrewSize = async (id) => {
 
     const crew = await getCrew(starships)
 
-    console.log(crew)
+    return crew
 }
 
-console.log(getCrewSize(1));
+getCrewSize(1).then(res=>console.log(res))

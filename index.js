@@ -1,27 +1,24 @@
 const fetch = require('node-fetch');
 
-const getCrew = async (urlArray) => {
-    const res = await Promise.all(
-        urlArray.map(async (url)=>{
-            const data = await fetch(`${url}`)
-            return data.json()
-        }));
+const getCrewSize = async (id) =>{
+  const res = await fetch(`https://swapi.dev/api/people/${id}`)
+  const {starships} = await res.json();
 
-    const sum = res.reduce((acc, value)=> {
-        if(value.crew){
-            acc += Number(value.crew)
-        }else acc += 1
-        return acc
-    }, 0)
-    return sum
-}
-const getCrewSize = async (id) => {
-    const res = await fetch(`https://swapi.dev/api/people/${id}`)
-    const {starships} = await res.json();
+  if(starships.length === 0) return 0;
 
-    const crew = await getCrew(starships)
+  const shipArray = await Promise.all(
+    starships.map(ship=>
+      fetch(ship)
+      .then(res=>res.json())));
+  
+  
+  return shipArray.reduce((acc,val)=>{
+    if(!val.crew){
+      acc += 1
+    }else acc+=+val.crew
+    return acc
+  },0)
+  
 
-    return crew
-}
-
-getCrewSize(1).then(res=>console.log(res))
+};
+getCrewSize(1).then(data=>console.log(data))
